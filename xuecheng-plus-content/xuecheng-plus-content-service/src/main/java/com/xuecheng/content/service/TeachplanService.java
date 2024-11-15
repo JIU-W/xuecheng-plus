@@ -21,6 +21,13 @@ public interface TeachplanService {
      * @param courseId
      * @return
      */
-    public List<TeachplanDto> findTeachplanTree(long courseId);
+    List<TeachplanDto> findTeachplanTree(long courseId);
+
+
+    /**
+     * 保存课程计划
+     * @param teachplanDto
+     */
+    void saveTeachplan(SaveTeachplanDto teachplanDto);
 
 }
