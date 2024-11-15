@@ -60,6 +60,12 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
     }
 
+    /**
+     * 获取课程计划最大排序号
+     * @param courseId
+     * @param parentid
+     * @return
+     */
     private int getOrderByMax(Long courseId, Long parentid) {
         int maxCount = teachplanMapper.selectMaxOrderBy(courseId, parentid);
         return maxCount;
