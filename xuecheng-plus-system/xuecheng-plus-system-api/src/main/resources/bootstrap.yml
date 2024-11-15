@@ -1,0 +1,24 @@
+server:
+  servlet:
+    context-path: /system
+  port: 63110
+#微服务配置
+spring:
+  application:
+    name: system-api
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.101.65:3306/xcplus_system?serverTimezone=UTC&userUnicode=true&useSSL=false&
+    username: root
+    password: mysql
+# 日志文件配置路径
+logging:
+  config: classpath:log4j2-dev.xml
+
+# swagger 文档配置
+swagger:
+  title: "学成在线系统管理"
+  description: "系统管理接口"
+  base-package: com.xuecheng.system
+  enabled: true
+  version: 1.0.0
