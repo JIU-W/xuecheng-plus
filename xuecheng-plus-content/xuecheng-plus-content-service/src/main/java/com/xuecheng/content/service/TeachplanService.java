@@ -36,4 +36,12 @@ public interface TeachplanService {
      */
     void deleteTeachplan(Long id);
 
+    /**
+     * 课程计划排序
+     * @param moveType
+     * @param id
+     */
+    void orderby(String moveType, Long id);
+
+
 }
