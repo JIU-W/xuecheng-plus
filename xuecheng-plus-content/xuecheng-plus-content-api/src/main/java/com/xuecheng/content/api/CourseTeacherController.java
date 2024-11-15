@@ -6,6 +6,7 @@ import com.xuecheng.content.service.CourseTeacherService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -42,7 +43,7 @@ public class CourseTeacherController {
      */
     @ApiOperation("新增课程教师信息")
     @PostMapping()
-    public CourseTeacher addCourseTeacher(@RequestBody AddCourseTeacherDto addCourseTeacherDto){
+    public CourseTeacher addCourseTeacher(@RequestBody @Validated AddCourseTeacherDto addCourseTeacherDto){
         Long companyId = 1232141425L;
         CourseTeacher courseTeacher = courseTeacherService.addCourseTeacher(companyId, addCourseTeacherDto);
         return courseTeacher;
