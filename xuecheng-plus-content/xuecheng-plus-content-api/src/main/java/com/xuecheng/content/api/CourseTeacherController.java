@@ -40,6 +40,7 @@ public class CourseTeacherController {
      * @param addCourseTeacherDto
      * @return
      */
+    @ApiOperation("新增课程教师信息")
     @PostMapping()
     public CourseTeacher addCourseTeacher(@RequestBody AddCourseTeacherDto addCourseTeacherDto){
         Long companyId = 1232141425L;
@@ -52,6 +53,7 @@ public class CourseTeacherController {
      * @param courseTeacher
      * @return
      */
+    @ApiOperation("修改课程教师信息")
     @PutMapping()
     public CourseTeacher updateCourseTeacher(@RequestBody CourseTeacher courseTeacher){
         //Long companyId = 1232141425L;
@@ -60,10 +62,11 @@ public class CourseTeacherController {
     }
 
     /**
-     * 根据课程id和教师id删除课程教师信息
+     * 根据课程id和id删除课程教师信息
      * @param courseId
      * @param id
      */
+    @ApiOperation("根据课程id和id删除课程教师信息")
     @DeleteMapping("/course/{courseId}/{id}")
     public void deleteCourseTeacherByCourseIdAndId(@PathVariable Long courseId, @PathVariable Long id){
         Long companyId = 1232141425L;
