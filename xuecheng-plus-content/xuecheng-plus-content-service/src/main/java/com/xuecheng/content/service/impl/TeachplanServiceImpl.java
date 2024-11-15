@@ -1,6 +1,7 @@
 package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
@@ -61,13 +62,50 @@ public class TeachplanServiceImpl implements TeachplanService {
     }
 
     /**
+     * 删除课程计划
+     * @param id
+     */
+    public void deleteTeachplan(Long id) {
+        Teachplan teachplan = teachplanMapper.selectById(id);
+        if(teachplan == null){
+            throw new XueChengPlusException("课程计划不存在");
+        }
+        Long parentid = teachplan.getParentid();
+        if(parentid == 0){
+            LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(Teachplan::getParentid,id);
+            List<Teachplan> tps = teachplanMapper.selectList(queryWrapper);
+            if(tps.size() == 0){
+                //删除大章节
+                int i = teachplanMapper.deleteById(id);
+                if(i <= 0){
+                    throw new XueChengPlusException("删除大章节失败");
+                }
+            }else {
+                throw new XueChengPlusException("本大章节下有小章节，不允许删除");
+            }
+        }else{
+            //删除小节
+            int ii = teachplanMapper.deleteById(id);
+            if(ii <= 0){
+                throw new XueChengPlusException("删除小章节失败");
+            }
+            //同时删除小节 关联的媒资文件
+            teachplanMapper.delectTeachplanMedia(id);
+        }
+    }
+
+    /**
      * 获取课程计划最大排序号
      * @param courseId
      * @param parentid
      * @return
      */
     private int getOrderByMax(Long courseId, Long parentid) {
-        int maxCount = teachplanMapper.selectMaxOrderBy(courseId, parentid);
+        Integer maxCount = teachplanMapper.selectMaxOrderBy(courseId, parentid);
+        if(maxCount == null){
+            return 0;
+        }
         return maxCount;
     }
 

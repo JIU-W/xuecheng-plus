@@ -29,7 +29,12 @@ public interface TeachplanMapper extends BaseMapper<Teachplan> {
      * @param courseId
      * @param parentid
      */
-    int selectMaxOrderBy(@Param("courseId") Long courseId, @Param("parentid") Long parentid);
+    Integer selectMaxOrderBy(@Param("courseId") Long courseId, @Param("parentid") Long parentid);
 
+    /**
+     * 根据课程计划id删除课程计划关联的媒资信息
+     * @param id
+     */
+    void delectTeachplanMedia(Long id);
 
 }

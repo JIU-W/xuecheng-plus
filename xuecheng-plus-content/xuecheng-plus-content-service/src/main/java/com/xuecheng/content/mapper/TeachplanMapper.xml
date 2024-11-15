@@ -102,10 +102,14 @@
                  two.orderby
     </select>
 
-    <select id="selectMaxOrderBy" resultType="int">
+    <select id="selectMaxOrderBy" resultType="java.lang.Integer">
         select max(orderby) from teachplan
         where course_id = #{courseId} and parentid = #{parentid}
     </select>
 
+    <delete id="delectTeachplanMedia" parameterType="Long">
+        DELETE FROM teachplan_media
+        WHERE teachplan_id = #{id}
+    </delete>
 
 </mapper>
