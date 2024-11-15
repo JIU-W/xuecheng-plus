@@ -86,10 +86,10 @@ public class CourseBaseInfoController {
 
     /**
      * 根据id删除课程信息
-     * @param id
+     * @param courseId
      */
     @ApiOperation("删除课程信息")
-    @PutMapping("/course/{courseId}")
+    @DeleteMapping("/course/{courseId}")
     public void deleteCourseBaseById(@PathVariable Long courseId) {
         courseBaseInfoService.deleteCourseBaseById(courseId);
     }
