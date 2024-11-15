@@ -3,7 +3,9 @@ package com.xuecheng.content.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -58,6 +60,16 @@ public interface TeachplanMapper extends BaseMapper<Teachplan> {
     Teachplan selectOrderLargeAndClose(@Param("courseId")Long courseId,
                                        @Param("orderby")Integer orderby,
                                        @Param("parentid")Long parentid);
+
+    /**
+     * 根据课程id删除课程计划
+     * @param courseId
+     */
+    @Delete("DELETE from teachplan where course_id = #{courseId}")
+    void delectTeachplan(@Param("courseId") Long courseId);
+
+    @Delete("DELETE from teachplan_media where course_id = #{courseId}")
+    void deleteTeachplanMedia(@Param("courseId")Long courseId);
 
 
 }
