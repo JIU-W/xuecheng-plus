@@ -113,7 +113,7 @@ public class TeachplanServiceImpl implements TeachplanService {
         Integer orderby = teachplan.getOrderby();
 
         //给大章节或者小章节进行上移或者下移
-        if ("moveup".equals(moveType)) {
+        if("moveup".equals(moveType)) {
             //给大章节或者小章节进行 上移
             Teachplan OrderSmallAndCloseTeachplan = teachplanMapper
                     .selectOrderSmallAndClose(courseId, orderby, parentid);
@@ -129,7 +129,7 @@ public class TeachplanServiceImpl implements TeachplanService {
             teachplanMapper.updateById(teachplan);
             OrderSmallAndCloseTeachplan.setOrderby(temp);
             teachplanMapper.updateById(OrderSmallAndCloseTeachplan);
-        } else if ("movedown".equals(moveType)) {
+        }else if("movedown".equals(moveType)) {
             //给大章节或者小章节进行 下移
             Teachplan OrderLargeAndCloseTeachplan = teachplanMapper
                     .selectOrderLargeAndClose(courseId, orderby, parentid);
