@@ -276,7 +276,6 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //删除课程教师信息
         courseTeacherMapper.deleteCourseTeacher(courseId);
 
-
     }
 
 
