@@ -5,9 +5,9 @@ spring:
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
-        #discovery:  # system模块的api层已经注册到nacos了，service层不需要再注注册了
-        # namespace: dev
-        # group: xuecheng-plus-project
+        #discovery:
+          #namespace: dev
+          #group: xuecheng-plus-project
       config:
         namespace: dev
         group: xuecheng-plus-project
