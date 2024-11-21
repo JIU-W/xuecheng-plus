@@ -41,7 +41,9 @@ public class MediaFilesController {
     @ApiOperation("上传文件")
     @RequestMapping(value = "/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UploadFileResultDto upload(@RequestPart("filedata") MultipartFile fileData) throws IOException {
-
+        //fileData是一个临时文件，需要转存到指定位置(目标位置是minio文件系统)，否则本次请求完成后临时文件会删除。
+        //因为获取不到fileData的路径，所以先把他手动转存到另一个临时文件tempFile中，而此时tempFile的路径
+        //就是参数本地文件路径(absolutePath)从而传到service层用以将文件上传到minio
         Long companyId = 1232141425L;
         //准备上传文件的信息
         UploadFileParamsDto uploadFileParamsDto = new UploadFileParamsDto();
@@ -53,7 +55,7 @@ public class MediaFilesController {
         long fileSize = fileData.getSize();
         uploadFileParamsDto.setFileSize(fileSize);
 
-        //创建临时文件(项目上线后就是在 服务器 上创建临时文件)
+        //创建临时文件(在本地创建临时文件)(项目上线后就是在服务器上创建临时文件)
         File tempFile = File.createTempFile("minio", "temp");
         //上传的文件拷贝到临时文件
         fileData.transferTo(tempFile);
