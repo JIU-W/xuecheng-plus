@@ -13,7 +13,7 @@ import java.io.RandomAccessFile;
 import java.util.*;
 
 /**
- * @author Mr.M
+ * @author JIU-W
  * @version 1.0
  * @description 大文件处理测试
  * @date 2022/9/13 9:21
@@ -117,7 +117,7 @@ public class BigFileTest {
         raf_write.close();
 
         //合并完成后对合并的文件进行校验，检查文件有没有丢包之类的
-        try(
+        try (
                 FileInputStream fileInputStream = new FileInputStream(originalFile);
                 FileInputStream mergeFileStream = new FileInputStream(mergeFile);
         ) {
@@ -135,9 +135,6 @@ public class BigFileTest {
 
 
     }
-
-
-
 
 
 }

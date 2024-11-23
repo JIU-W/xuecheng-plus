@@ -105,7 +105,7 @@ public class MinioTest {
 
     //将分块文件上传至minio(保证每个分块文件的文件名不变)
     @Test
-    public void uploadChunk(){
+    public void uploadChunk() {
         String chunkFolderPath = "D:\\音频视频\\bigfile_test\\chunk\\";
         File chunkFolder = new File(chunkFolderPath);
         //分块文件(文件夹中所有文件的File对象数组)
@@ -130,7 +130,7 @@ public class MinioTest {
                         .filename(file.getAbsolutePath())//本地文件路径
                         .build();
                 minioClient.uploadObject(uploadObjectArgs);
-                System.out.println("上传分块成功"+i);
+                System.out.println("上传分块成功" + i);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -228,11 +228,9 @@ public class MinioTest {
     //在上传后检查一下minio中小于5M的文件的文件名的数字是不是最大的。
 
 
-
-
     //清除分块文件
     @Test
-    public void test_removeObjects(){
+    public void test_removeObjects() {
         //合并分块完成将分块文件清除
         List<DeleteObject> deleteObjects = Stream.iterate(0, i -> ++i)
                 .limit(3)
@@ -244,7 +242,7 @@ public class MinioTest {
                 .objects(deleteObjects)
                 .build();
         Iterable<Result<DeleteError>> results = minioClient.removeObjects(removeObjectsArgs);
-        results.forEach(r->{
+        results.forEach(r -> {
             DeleteError deleteError = null;
             try {
                 deleteError = r.get();
@@ -253,7 +251,6 @@ public class MinioTest {
             }
         });
     }
-
 
 
 }
