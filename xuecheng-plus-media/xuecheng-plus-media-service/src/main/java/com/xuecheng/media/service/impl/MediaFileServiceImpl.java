@@ -9,10 +9,12 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.mapper.MediaProcessMapper;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.model.po.MediaProcess;
 import com.xuecheng.media.service.MediaFileService;
 import io.minio.*;
 import io.minio.messages.DeleteError;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +65,10 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Autowired
     MediaFileService currentProxy;
+
+    @Autowired
+    private MediaProcessMapper mediaProcessMapper;
+
 
     /**
      * 根据条件查询文件
@@ -186,10 +193,43 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.error("保存文件信息到数据库失败,{}", mediaFiles.toString());
                 XueChengPlusException.cast("保存文件信息失败");
             }
+
+            //这个方法加入了事务控制
+            //"记录待处理任务"，因为这个也要操作数据库表并且要保证一定是“上传视频文件成功后”才“记录待处理任务”，
+            //所以要加入事务控制
+            addWaitingTask(mediaFiles);
+
             log.debug("保存文件信息到数据库成功,{}", mediaFiles.toString());
         }
         return mediaFiles;
     }
+
+    /**
+     * 添加待处理任务(添加到待处理任务表)
+     * @param mediaFiles 媒资文件信息
+     */
+    private void addWaitingTask(MediaFiles mediaFiles) {
+        //文件名称
+        String filename = mediaFiles.getFilename();
+        //文件扩展名
+        String extension = filename.substring(filename.lastIndexOf("."));
+        //获取文件mimeType
+        String mimeType = getMimeType(extension);
+        //如果是avi视频添加到视频待处理表
+        if (mimeType.equals("video/x-msvideo")) {
+            MediaProcess mediaProcess = new MediaProcess();
+            BeanUtils.copyProperties(mediaFiles, mediaProcess);
+            //状态
+            mediaProcess.setStatus("1");//未处理
+            //创建时间(有自动填充策略)
+            //mediaProcess.setCreateDate(LocalDateTime.now());
+            //失败次数
+            mediaProcess.setFailCount(0);//失败次数默认为0
+            mediaProcess.setUrl(null);
+            mediaProcessMapper.insert(mediaProcess);
+        }
+    }
+
 
     /**
      * 上传普通文件
@@ -317,6 +357,7 @@ public class MediaFileServiceImpl implements MediaFileService {
     //得到分块文件的目录
     //分块存储的路径是：md5前两位为两个目录，chunk存储分块文件
     //1/2/fileMd5/chunk/
+    //这样设置“存储目录规则”主要是尽量让目录呈树型状，可以加快对文件的查找。
     private String getChunkFileFolderPath(String fileMd5) {
         return fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" + "chunk" + "/";
     }
