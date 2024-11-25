@@ -29,13 +29,12 @@ import java.util.List;
 public class MediaFileProcessServiceImpl implements MediaFileProcessService {
 
     @Autowired
-    MediaFilesMapper mediaFilesMapper;
+    private MediaFilesMapper mediaFilesMapper;
 
     @Autowired
-    MediaProcessMapper mediaProcessMapper;
+    private MediaProcessMapper mediaProcessMapper;
 
 
-    @Override
     public List<MediaProcess> getMediaProcessList(int shardIndex, int shardTotal, int count) {
         List<MediaProcess> mediaProcesses = mediaProcessMapper
                 .selectListByShardIndex(shardTotal, shardIndex, count);

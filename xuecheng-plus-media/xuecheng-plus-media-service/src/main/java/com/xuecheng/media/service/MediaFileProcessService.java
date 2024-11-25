@@ -14,10 +14,10 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author Mr.M
- * @version 1.0
  * @description 媒资文件处理业务方法
- * @date 2022/9/10 8:55
+ * @author JIU-W
+ * @date 2024-11-25
+ * @version 1.0
  */
 public interface MediaFileProcessService {
 
