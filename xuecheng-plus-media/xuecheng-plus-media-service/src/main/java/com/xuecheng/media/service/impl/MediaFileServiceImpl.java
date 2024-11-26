@@ -166,7 +166,7 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param objectName          对象名称
      * @return com.xuecheng.media.model.po.MediaFiles
      * @description 将文件信息添加到文件表
-     * @author Mr.M
+     * @author JIU-W
      * @date 2022/10/12 21:22
      */
     @Transactional

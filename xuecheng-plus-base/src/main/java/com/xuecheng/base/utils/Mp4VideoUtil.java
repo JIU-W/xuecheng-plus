@@ -56,8 +56,9 @@ public class Mp4VideoUtil extends VideoUtil {
         commend.add("63k");
         commend.add("-b:v");
         commend.add("753k");
-        commend.add("-r");
-        commend.add("18");
+        //不指定帧率，使用原视频的帧率！！！！！！
+        //commend.add("-r");
+        //commend.add("18");
         commend.add(mp4folder_path);
         String outstring = null;
         try {
@@ -74,6 +75,7 @@ public class Mp4VideoUtil extends VideoUtil {
         }
 
 //        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path + mp4_name);
+        //检查视频时间是否一致
         Boolean check_video_time = this.check_video_time(video_path, mp4folder_path);
         if (!check_video_time) {
             return outstring;
