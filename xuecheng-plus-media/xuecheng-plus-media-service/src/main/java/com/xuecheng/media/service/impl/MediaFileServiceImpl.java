@@ -228,6 +228,11 @@ public class MediaFileServiceImpl implements MediaFileService {
             mediaProcess.setUrl(null);
             mediaProcessMapper.insert(mediaProcess);
         }
+        //这里只考虑了avi类型的，如果还有其它非MP4类型的视频，那就把所有的这些类型
+        //写成一个集合或者枚举或者直接配置化，然后判断 mimeType 属不属于这个集合，然后统一处理即可。
+        //统一处理的逻辑就是如上逻辑。
+
+        //但如果上传的是MP4文件，则不需要加入待处理任务表。
     }
 
 
