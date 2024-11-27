@@ -225,4 +225,22 @@ public class TeachplanServiceImpl implements TeachplanService {
 
     }
 
+
+    public void deleteTeachplanMedia(Long teachPlanId, String mediaId) {
+        Teachplan teachplan = teachplanMapper.selectById(teachPlanId);
+        if (teachplan == null) {
+            XueChengPlusException.cast("教学计划不存在");
+        }
+        TeachplanMedia teachplanMedia = teachplanMediaMapper.selectOne(new LambdaQueryWrapper<TeachplanMedia>()
+                .eq(TeachplanMedia::getTeachplanId, teachPlanId)
+                .eq(TeachplanMedia::getMediaId, mediaId));
+        if (teachplanMedia == null) {
+            throw new XueChengPlusException("该教学计划与媒资关系不存在");
+        }
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeachplanMedia::getTeachplanId, teachPlanId);
+        queryWrapper.eq(TeachplanMedia::getMediaId, mediaId);
+        teachplanMediaMapper.delete(queryWrapper);
+    }
+
 }

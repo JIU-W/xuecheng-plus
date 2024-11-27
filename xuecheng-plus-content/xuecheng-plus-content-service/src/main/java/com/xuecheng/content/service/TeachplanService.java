@@ -51,5 +51,11 @@ public interface TeachplanService {
      */
     TeachplanMedia associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto);
 
+    /**
+     * 解除教学计划与媒资的绑定
+     * @param teachPlanId
+     * @param mediaId
+     */
+    void deleteTeachplanMedia(Long teachPlanId, String mediaId);
 
 }
