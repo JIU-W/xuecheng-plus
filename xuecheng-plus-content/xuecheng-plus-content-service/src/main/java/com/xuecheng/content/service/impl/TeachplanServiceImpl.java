@@ -3,15 +3,20 @@ package com.xuecheng.content.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
+import com.xuecheng.content.mapper.TeachplanMediaMapper;
+import com.xuecheng.content.model.dto.BindTeachplanMediaDto;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
+import com.xuecheng.content.model.po.TeachplanMedia;
 import com.xuecheng.content.service.TeachplanService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,6 +30,10 @@ public class TeachplanServiceImpl implements TeachplanService {
 
     @Resource
     private TeachplanMapper teachplanMapper;
+
+    @Resource
+    private TeachplanMediaMapper teachplanMediaMapper;
+
 
     /**
      * 查询课程计划(树形结构)
@@ -100,6 +109,7 @@ public class TeachplanServiceImpl implements TeachplanService {
 
     /**
      * 课程计划排序
+     *
      * @param moveType
      * @param id
      */
@@ -113,7 +123,7 @@ public class TeachplanServiceImpl implements TeachplanService {
         Integer orderby = teachplan.getOrderby();
 
         //给大章节或者小章节进行上移或者下移
-        if("moveup".equals(moveType)) {
+        if ("moveup".equals(moveType)) {
             //给大章节或者小章节进行 上移
             Teachplan OrderSmallAndCloseTeachplan = teachplanMapper
                     .selectOrderSmallAndClose(courseId, orderby, parentid);
@@ -129,7 +139,7 @@ public class TeachplanServiceImpl implements TeachplanService {
             teachplanMapper.updateById(teachplan);
             OrderSmallAndCloseTeachplan.setOrderby(temp);
             teachplanMapper.updateById(OrderSmallAndCloseTeachplan);
-        }else if("movedown".equals(moveType)) {
+        } else if ("movedown".equals(moveType)) {
             //给大章节或者小章节进行 下移
             Teachplan OrderLargeAndCloseTeachplan = teachplanMapper
                     .selectOrderLargeAndClose(courseId, orderby, parentid);
@@ -149,6 +159,7 @@ public class TeachplanServiceImpl implements TeachplanService {
 
 
     }
+
 
     /**
      * 获取课程计划最大排序号
@@ -178,6 +189,40 @@ public class TeachplanServiceImpl implements TeachplanService {
         queryWrapper.eq(Teachplan::getParentid, parentid);
         Integer count = teachplanMapper.selectCount(queryWrapper);
         return count;
+    }
+
+    @Transactional
+    public TeachplanMedia associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto) {
+
+        //教学计划id
+        Long teachplanId = bindTeachplanMediaDto.getTeachplanId();
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+        if (teachplan == null) {
+            XueChengPlusException.cast("教学计划不存在");
+        }
+        Integer grade = teachplan.getGrade();
+        if (grade != 2) {
+            XueChengPlusException.cast("只允许第二级教学计划绑定媒资文件");
+        }
+
+        //先删除原来该教学计划绑定的媒资
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeachplanMedia::getTeachplanId, teachplanId);
+        teachplanMediaMapper.delete(queryWrapper);
+
+        //课程id
+        Long courseId = teachplan.getCourseId();
+
+        //再添加教学计划与媒资的绑定关系
+        TeachplanMedia teachplanMedia = new TeachplanMedia();
+        teachplanMedia.setCourseId(courseId);
+        teachplanMedia.setTeachplanId(teachplanId);
+        teachplanMedia.setMediaFilename(bindTeachplanMediaDto.getFileName());
+        teachplanMedia.setMediaId(bindTeachplanMediaDto.getMediaId());
+        teachplanMedia.setCreateDate(LocalDateTime.now());
+        teachplanMediaMapper.insert(teachplanMedia);
+        return teachplanMedia;
+
     }
 
 }
