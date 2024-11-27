@@ -4,6 +4,7 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.model.dto.*;
 import com.xuecheng.content.model.po.CourseBase;
+import com.xuecheng.content.model.po.TeachplanMedia;
 
 import java.util.List;
 
@@ -29,5 +30,32 @@ public interface TeachplanService {
      * @param teachplanDto
      */
     void saveTeachplan(SaveTeachplanDto teachplanDto);
+
+    /**
+     * 删除课程计划
+     * @param id
+     */
+    void deleteTeachplan(Long id);
+
+    /**
+     * 课程计划排序
+     * @param moveType
+     * @param id
+     */
+    void orderby(String moveType, Long id);
+
+    /**
+     * @description 教学计划绑定媒资
+     * @param bindTeachplanMediaDto
+     * @return com.xuecheng.content.model.po.TeachplanMedia
+     */
+    TeachplanMedia associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto);
+
+    /**
+     * 解除教学计划与媒资的绑定
+     * @param teachPlanId
+     * @param mediaId
+     */
+    void deleteTeachplanMedia(Long teachPlanId, String mediaId);
 
 }

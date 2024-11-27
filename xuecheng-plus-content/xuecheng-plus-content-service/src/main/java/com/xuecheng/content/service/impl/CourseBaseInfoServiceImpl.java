@@ -1,13 +1,12 @@
 package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.mapper.CourseBaseMapper;
-import com.xuecheng.content.mapper.CourseCategoryMapper;
-import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.*;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
@@ -40,6 +39,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
     @Resource
     private CourseCategoryMapper courseCategoryMapper;
+
+    @Resource
+    private TeachplanMapper teachplanMapper;
+
+    @Resource
+    private CourseTeacherMapper courseTeacherMapper;
 
     /**
      * 课程查询接口(分页)
@@ -250,6 +255,27 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //查询课程信息
         CourseBaseInfoDto courseBaseInfo = this.getCourseBaseInfo(courseId);
         return courseBaseInfo;
+    }
+
+
+    public void deleteCourseBaseById(Long courseId) {
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(courseBase == null){
+            throw new XueChengPlusException("课程不存在");
+        }
+        //删除课程基本信息
+        int i = courseBaseMapper.deleteById(courseId);
+        if(i <= 0)throw new XueChengPlusException("删除课程失败");
+        //删除课程营销信息
+        LambdaQueryWrapper<CourseMarket> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(CourseMarket::getId, courseId);
+        courseMarketMapper.delete(queryWrapper1);
+        //删除课程计划以及其对应的媒资信息
+        teachplanMapper.delectTeachplan(courseId);
+        teachplanMapper.deleteTeachplanMedia(courseId);
+        //删除课程教师信息
+        courseTeacherMapper.deleteCourseTeacher(courseId);
+
     }
 
 

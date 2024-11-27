@@ -3,7 +3,9 @@ package com.xuecheng.content.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -29,7 +31,45 @@ public interface TeachplanMapper extends BaseMapper<Teachplan> {
      * @param courseId
      * @param parentid
      */
-    int selectMaxOrderBy(@Param("courseId") Long courseId, @Param("parentid") Long parentid);
+    Integer selectMaxOrderBy(@Param("courseId") Long courseId,
+                             @Param("parentid") Long parentid);
+
+    /**
+     * 根据课程计划id删除课程计划关联的媒资信息
+     * @param id
+     */
+    void delectTeachplanMedia(Long id);
+
+    /**
+     * 查询排序字段较小且离的最近的字段id
+     * @param courseId
+     * @param parentid
+     * @return
+     */
+    Teachplan selectOrderSmallAndClose(@Param("courseId")Long courseId,
+                                  @Param("orderby")Integer orderby,
+                                  @Param("parentid")Long parentid);
+
+    /**
+     * 查询排序字段较大且离的最近的字段id
+     * @param courseId
+     * @param orderby
+     * @param parentid
+     * @return
+     */
+    Teachplan selectOrderLargeAndClose(@Param("courseId")Long courseId,
+                                       @Param("orderby")Integer orderby,
+                                       @Param("parentid")Long parentid);
+
+    /**
+     * 根据课程id删除课程计划
+     * @param courseId
+     */
+    @Delete("DELETE from teachplan where course_id = #{courseId}")
+    void delectTeachplan(@Param("courseId") Long courseId);
+
+    @Delete("DELETE from teachplan_media where course_id = #{courseId}")
+    void deleteTeachplanMedia(@Param("courseId")Long courseId);
 
 
 }

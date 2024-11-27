@@ -1,23 +1,29 @@
-server:
-  servlet:
-    context-path: /content
-  port: 63040
 #微服务配置
 spring:
   application:
-    name: content-api
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.101.65:3306/xcplus_content?serverTimezone=UTC&userUnicode=true&useSSL=false&
-    username: root
-    password: mysql
-# 日志文件配置路径
-logging:
-  config: classpath:log4j2-dev.xml
+    name: content-api #服务名称  得留着 1.上报服务到nacos  2.作为dataid第一部分去确定配置文件名称
+  cloud:
+    nacos:
+      server-addr: 192.168.101.65:8848
+      discovery:  #服务注册相关配置   :得留着上报服务到nacos
+        namespace: dev
+        group: xuecheng-plus-project
+      config:     # 配置文件相关信息   从nacos配置中心拿配置
+        namespace: dev
+        group: xuecheng-plus-project
+        file-extension: yaml      # 作为dataid的第三部分
+        refresh-enabled: true
+        extension-configs:  # 扩展获取service层的配置文件信息   像数据库这种属于service层的配置信息就可以去service层找
+          - data-id: content-service-${spring.profiles.active}.yaml
+            group: xuecheng-plus-project
+            refresh: true
+        shared-configs:    #引入nacos中的公用配置
+          - data-id: swagger-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+          - data-id: logging-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+  profiles:
+    active: dev   # 环境名称   作为dataid的第二部分
 
-swagger:
-  title: "学成在线内容管理系统"
-  description: "内容系统管理系统对课程相关信息进行管理"
-  base-package: com.xuecheng.content
-  enabled: true
-  version: 1.0.0

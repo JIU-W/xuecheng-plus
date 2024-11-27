@@ -70,6 +70,11 @@ public class CourseBaseInfoController {
         return courseBaseInfo;
     }
 
+    /**
+     * 修改课程信息
+     * @param editCourseDto
+     * @return
+     */
     @ApiOperation("修改课程信息")
     @PutMapping("/course")
     public CourseBaseInfoDto modifyCourseBase(@RequestBody @Validated({ValidationGroups.Update.class})
@@ -77,6 +82,16 @@ public class CourseBaseInfoController {
         //机构id，由于认证系统没有上线暂时硬编码
         Long companyId = 1232141425L;
         return courseBaseInfoService.updateCourseBase(companyId, editCourseDto);
+    }
+
+    /**
+     * 根据id删除课程信息
+     * @param courseId
+     */
+    @ApiOperation("删除课程信息")
+    @DeleteMapping("/course/{courseId}")
+    public void deleteCourseBaseById(@PathVariable Long courseId) {
+        courseBaseInfoService.deleteCourseBaseById(courseId);
     }
 
 

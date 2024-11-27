@@ -33,4 +33,5 @@ public class DictionaryController  {
     public Dictionary getByCode(@PathVariable String code) {
         return dictionaryService.getByCode(code);
     }
+
 }

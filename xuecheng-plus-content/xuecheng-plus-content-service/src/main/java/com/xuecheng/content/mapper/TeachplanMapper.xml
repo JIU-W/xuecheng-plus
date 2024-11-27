@@ -102,9 +102,29 @@
                  two.orderby
     </select>
 
-    <select id="selectMaxOrderBy" resultType="int">
+    <select id="selectMaxOrderBy" resultType="java.lang.Integer">
         select max(orderby) from teachplan
         where course_id = #{courseId} and parentid = #{parentid}
+    </select>
+
+    <delete id="delectTeachplanMedia" parameterType="Long">
+        DELETE FROM teachplan_media
+        WHERE teachplan_id = #{id}
+    </delete>
+
+    <select id="selectOrderSmallAndClose" resultType="com.xuecheng.content.model.po.Teachplan">
+        SELECT * FROM teachplan
+        WHERE course_id = #{courseId} AND parentid = #{parentid} AND orderby  &lt; #{orderby}
+        ORDER BY orderby DESC
+        LIMIT 1;
+    </select>
+    <!-- &lt; ：这是 < 符号的 XML 转义字符，用于避免 XML 解析错误。-->
+
+    <select id="selectOrderLargeAndClose" resultType="com.xuecheng.content.model.po.Teachplan">
+        SELECT * FROM teachplan
+        WHERE course_id = #{courseId} AND parentid = #{parentid} AND orderby > #{orderby}
+        ORDER BY orderby ASC
+        LIMIT 1;
     </select>
 
 
