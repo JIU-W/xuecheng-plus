@@ -23,13 +23,13 @@ import java.util.List;
  * @date 2023/2/14 15:09
  */
 @SpringBootTest
-public class CourseBaseMapperTests {
+ class CourseBaseMapperTests {
 
     @Resource
     private CourseBaseMapper courseBaseMapper;
 
     @Test
-    public void testCourseBaseMapper(){
+     void testCourseBaseMapper(){
         CourseBase courseBase = courseBaseMapper.selectById(74L);
         Assertions.assertNotNull(courseBase);
 
@@ -49,7 +49,7 @@ public class CourseBaseMapperTests {
         queryWrapper.eq(StringUtils.isNotEmpty(courseParamsDto.getAuditStatus()),CourseBase::getAuditStatus,courseParamsDto.getAuditStatus());
 
         //TODO 按课程发布状态查询
-        
+
 
 
 
