@@ -71,7 +71,10 @@ public class CoursePublishTask extends MessageProcessAbstract {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        int i = 1/0;
+
+        int i = 1/0;//制造一个异常表示任务执行中有问题
+
+
         //保存第一阶段状态
         mqMessageService.completedStageOne(id);
 

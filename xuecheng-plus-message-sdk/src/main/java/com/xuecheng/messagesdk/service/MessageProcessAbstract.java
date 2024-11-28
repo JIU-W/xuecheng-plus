@@ -36,7 +36,7 @@ public abstract class MessageProcessAbstract {
      * @param messageType 消息类型
      * @param count       一次取出任务总数
      * @param timeout     预估任务执行时间,到此时间如果任务还没有结束则强制结束 单位秒
-     * @description 扫描消息表多线程执行任务
+     * @description 扫描消息表，多线程执行任务
      */
     public void process(int shardIndex, int shardTotal, String messageType, int count, long timeout) {
         try {
