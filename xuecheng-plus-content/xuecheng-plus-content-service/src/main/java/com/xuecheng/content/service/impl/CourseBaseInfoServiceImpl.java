@@ -190,6 +190,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
      * @param courseId
      * @return
      */
+    @Transactional
     public CourseBaseInfoDto getCourseBaseInfo(long courseId) {
 
         CourseBase courseBase = courseBaseMapper.selectById(courseId);

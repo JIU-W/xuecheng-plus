@@ -113,6 +113,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         coursePublishPre.setCompanyId(companyId);
         //提交时间
         coursePublishPre.setCreateDate(LocalDateTime.now());
+        //通过课程预发布记录表的id(课程id)查询
         CoursePublishPre coursePublishPreUpdate = coursePublishPreMapper.selectById(courseId);
         if (coursePublishPreUpdate == null) {
             //添加课程预发布记录
