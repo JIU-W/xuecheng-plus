@@ -38,10 +38,19 @@ public class CoursePublishController {
 
 
     @ApiOperation("提交课程审核")
+    @ResponseBody
     @PostMapping("/courseaudit/commit/{courseId}")
     public void commitAudit(@PathVariable("courseId") Long courseId){
         Long companyId = 1232141425L;
         coursePublishService.commitAudit(companyId,courseId);
+    }
+
+    @ApiOperation("课程发布")
+    @ResponseBody
+    @PostMapping ("/coursepublish/{courseId}")
+    public void coursePublish(@PathVariable("courseId") Long courseId){
+        Long companyId = 1232141425L;
+        coursePublishService.publish(companyId,courseId);
     }
 
 }
