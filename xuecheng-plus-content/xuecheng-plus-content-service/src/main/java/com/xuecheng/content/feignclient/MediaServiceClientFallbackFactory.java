@@ -5,6 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @description fallback降级处理
+ * @author JIU-W
+ * @date 2024-11-29
+ * @version 1.0
+ */
 @Slf4j
 @Component
 public class MediaServiceClientFallbackFactory implements FallbackFactory<MediaServiceClient> {
