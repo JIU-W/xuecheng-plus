@@ -13,6 +13,10 @@ spring:
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
+        shared-configs:    #引入nacos中的公用配置 (openfeign的配置)
+          - data-id: feign-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
   # profiles默认为dev
   profiles:
     active: dev
