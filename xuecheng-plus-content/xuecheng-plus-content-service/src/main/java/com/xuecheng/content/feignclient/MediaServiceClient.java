@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @author Mr.M
+ * @author JIU-W
  * @version 1.0
  * @description 媒资管理服务远程接口
  * @date 2022/9/20 20:29
  */
-@FeignClient(value = "media-api", configuration = MultipartSupportConfig.class)
+@FeignClient(value = "media-api", configuration = MultipartSupportConfig.class
+        , fallbackFactory = MediaServiceClientFallbackFactory.class)
 public interface MediaServiceClient {
 
     @RequestMapping(value = "/media/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

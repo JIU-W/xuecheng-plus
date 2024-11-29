@@ -34,8 +34,11 @@ public class FeignUploadTest {
 
         MultipartFile multipartFile = MultipartSupportConfig.getMultipartFile(
                 new File("D:\\音频视频\\test.html"));
-
-        mediaServiceClient.uploadFile(multipartFile,"course/test.html");
+        //远程调用
+        String s = mediaServiceClient.uploadFile(multipartFile, "course/test.html");
+        if (s == null){
+            System.out.println("走了降级逻辑");
+        }
     }
 
 }
