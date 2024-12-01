@@ -7,22 +7,20 @@ import com.xuecheng.search.dto.SearchPageResultDto;
 import com.xuecheng.search.po.CourseIndex;
 
 /**
- * @description 课程搜索service
- * @author Mr.M
- * @date 2022/9/24 22:40
+ * @author JIU-W
  * @version 1.0
+ * @description 课程搜索service
+ * @date 2024-12-01
  */
 public interface CourseSearchService {
 
 
     /**
-     * @description 搜索课程列表
-     * @param pageParams 分页参数
+     * @param pageParams           分页参数
      * @param searchCourseParamDto 搜索条件
      * @return com.xuecheng.base.model.PageResult<com.xuecheng.search.po.CourseIndex> 课程列表
-     * @author Mr.M
-     * @date 2022/9/24 22:45
-    */
+     * @description 搜索课程列表
+     */
     SearchPageResultDto<CourseIndex> queryCoursePubIndex(PageParams pageParams, SearchCourseParamDto searchCourseParamDto);
 
- }
+}

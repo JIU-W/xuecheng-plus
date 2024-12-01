@@ -36,10 +36,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Mr.M
+ * @author JIU-W
  * @version 1.0
  * @description 课程搜索service实现类
- * @date 2022/9/24 22:48
+ * @date 2024-12-01
  */
 @Slf4j
 @Service
@@ -47,11 +47,12 @@ public class CourseSearchServiceImpl implements CourseSearchService {
 
     @Value("${elasticsearch.course.index}")
     private String courseIndexStore;
+
     @Value("${elasticsearch.course.source_fields}")
     private String sourceFields;
 
     @Autowired
-    RestHighLevelClient client;
+    private RestHighLevelClient client;
 
     @Override
     public SearchPageResultDto<CourseIndex> queryCoursePubIndex(PageParams pageParams, SearchCourseParamDto courseSearchParam) {
@@ -64,33 +65,33 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         //source源字段过虑
         String[] sourceFieldsArray = sourceFields.split(",");
         searchSourceBuilder.fetchSource(sourceFieldsArray, new String[]{});
-        if(courseSearchParam==null){
+        if (courseSearchParam == null) {
             courseSearchParam = new SearchCourseParamDto();
         }
         //关键字
-        if(StringUtils.isNotEmpty(courseSearchParam.getKeywords())){
+        if (StringUtils.isNotEmpty(courseSearchParam.getKeywords())) {
             //匹配关键字
             MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(courseSearchParam.getKeywords(), "name", "description");
             //设置匹配占比
             multiMatchQueryBuilder.minimumShouldMatch("70%");
             //提升另个字段的Boost值
-            multiMatchQueryBuilder.field("name",10);
+            multiMatchQueryBuilder.field("name", 10);
             boolQueryBuilder.must(multiMatchQueryBuilder);
         }
-        //过虑
-        if(StringUtils.isNotEmpty(courseSearchParam.getMt())){
-            boolQueryBuilder.filter(QueryBuilders.termQuery("mtName",courseSearchParam.getMt()));
+        //过滤
+        if (StringUtils.isNotEmpty(courseSearchParam.getMt())) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("mtName", courseSearchParam.getMt()));
         }
-        if(StringUtils.isNotEmpty(courseSearchParam.getSt())){
-            boolQueryBuilder.filter(QueryBuilders.termQuery("stName",courseSearchParam.getSt()));
+        if (StringUtils.isNotEmpty(courseSearchParam.getSt())) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("stName", courseSearchParam.getSt()));
         }
-        if(StringUtils.isNotEmpty(courseSearchParam.getGrade())){
-            boolQueryBuilder.filter(QueryBuilders.termQuery("grade",courseSearchParam.getGrade()));
+        if (StringUtils.isNotEmpty(courseSearchParam.getGrade())) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("grade", courseSearchParam.getGrade()));
         }
         //分页
         Long pageNo = pageParams.getPageNo();
         Long pageSize = pageParams.getPageSize();
-        int start = (int) ((pageNo-1)*pageSize);
+        int start = (int) ((pageNo - 1) * pageSize);
         searchSourceBuilder.from(start);
         searchSourceBuilder.size(Math.toIntExact(pageSize));
         //布尔查询
@@ -111,8 +112,8 @@ public class CourseSearchServiceImpl implements CourseSearchService {
             searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("课程搜索异常：{}",e.getMessage());
-            return new SearchPageResultDto<CourseIndex>(new ArrayList(),0,0,0);
+            log.error("课程搜索异常：{}", e.getMessage());
+            return new SearchPageResultDto<CourseIndex>(new ArrayList(), 0, 0, 0);
         }
 
         //结果集处理
@@ -137,9 +138,9 @@ public class CourseSearchServiceImpl implements CourseSearchService {
             String name = courseIndex.getName();
             //取出高亮字段内容
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-            if(highlightFields!=null){
+            if (highlightFields != null) {
                 HighlightField nameField = highlightFields.get("name");
-                if(nameField!=null){
+                if (nameField != null) {
                     Text[] fragments = nameField.getFragments();
                     StringBuffer stringBuffer = new StringBuffer();
                     for (Text str : fragments) {
@@ -155,10 +156,10 @@ public class CourseSearchServiceImpl implements CourseSearchService {
             list.add(courseIndex);
 
         }
-        SearchPageResultDto<CourseIndex> pageResult = new SearchPageResultDto<>(list, totalHits.value,pageNo,pageSize);
+        SearchPageResultDto<CourseIndex> pageResult = new SearchPageResultDto<>(list, totalHits.value, pageNo, pageSize);
 
         //获取聚合结果
-        List<String> mtList= getAggregation(searchResponse.getAggregations(), "mtAgg");
+        List<String> mtList = getAggregation(searchResponse.getAggregations(), "mtAgg");
         List<String> stList = getAggregation(searchResponse.getAggregations(), "stAgg");
 
         pageResult.setMtList(mtList);

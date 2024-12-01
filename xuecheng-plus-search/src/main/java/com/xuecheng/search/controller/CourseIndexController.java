@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author Mr.M
+ * @author JIU-W
  * @version 1.0
  * @description 课程索引接口
- * @date 2022/9/24 22:31
+ * @date 2024-12-01
  */
 @Api(value = "课程信息索引接口", tags = "课程信息索引接口")
 @RestController
@@ -34,11 +34,11 @@ public class CourseIndexController {
     public Boolean add(@RequestBody CourseIndex courseIndex) {
 
         Long id = courseIndex.getId();
-        if(id==null){
+        if (id == null) {
             XueChengPlusException.cast("课程id为空");
         }
         Boolean result = indexService.addCourseIndex(courseIndexStore, String.valueOf(id), courseIndex);
-        if(!result){
+        if (!result) {
             XueChengPlusException.cast("添加课程索引失败");
         }
         return result;

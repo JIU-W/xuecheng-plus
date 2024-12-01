@@ -8,7 +8,7 @@ spring:
         namespace: dev402
         group: xuecheng-plus-project
       config:
-        namespace: dev402
+        namespace: dev
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
