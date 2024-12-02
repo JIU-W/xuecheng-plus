@@ -2,6 +2,8 @@ package com.xuecheng.search.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -9,9 +11,10 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 课程索引信息
+ * 课程索引信息（其实就是 课程发布的索引库信息）
  * </p>
  */
+@ApiModel(description = "课程发布索引库实体")
 @Data
 public class CourseIndex implements Serializable {
 

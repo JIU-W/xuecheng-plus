@@ -35,15 +35,26 @@ public class IndexServiceImpl implements IndexService {
     @Autowired
     RestHighLevelClient client;
 
-    @Override
+    /**
+     * 给course_public索引库添加一条文档数据(添加索引)
+     * @param indexName 索引库名称
+     * @param id        主键(课程id)
+     * @param object    索引对象(索引库具体的文档信息)
+     * @return
+     */
     public Boolean addCourseIndex(String indexName, String id, Object object) {
+
+        //将索引库的文档数据序列化为json (这里的索引库实体用Object接收，将这部分逻辑抽象成通用的逻辑)
         String jsonString = JSON.toJSONString(object);
+
+        //1.创建Request对象，这里是IndexRequest，因为添加文档就是创建倒排索引的过程。
         IndexRequest indexRequest = new IndexRequest(indexName).id(id);
-        //指定索引文档内容
+        //2.准备json文档(指定索引文档内容)
         indexRequest.source(jsonString, XContentType.JSON);
         //索引响应对象
         IndexResponse indexResponse = null;
         try {
+            //3.发送请求
             indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("添加索引出错:{}", e.getMessage());
@@ -52,18 +63,32 @@ public class IndexServiceImpl implements IndexService {
         }
         String name = indexResponse.getResult().name();
         System.out.println(name);
+        //新增文档 和 全量修改文档 的API完全一致，判断依据是ID：
+        //- 如果新增时，ID已经存在，则修改
+        //- 如果新增时，ID不存在，则新增
         return name.equalsIgnoreCase("created") || name.equalsIgnoreCase("updated");
 
     }
 
-    @Override
+    /**
+     * 修改course_public索引库的一条文档信息(这里指的是局部修改，因为全量修改的API和新增文档的API一样)
+     *                                     局部修改：修改文档中的指定字段值。
+     * @param indexName 索引库名称
+     * @param id        主键
+     * @param object    索引对象
+     * @return
+     */
     public Boolean updateCourseIndex(String indexName, String id, Object object) {
-
+        //准备json数据：里面指定文档中要修改的字段。
         String jsonString = JSON.toJSONString(object);
+        //准备request对象
         UpdateRequest updateRequest = new UpdateRequest(indexName, id);
+        //填入json参数
         updateRequest.doc(jsonString, XContentType.JSON);
+
         UpdateResponse updateResponse = null;
         try {
+            //更新稳定
             updateResponse = client.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("更新索引出错:{}", e.getMessage());
@@ -72,17 +97,22 @@ public class IndexServiceImpl implements IndexService {
         }
         DocWriteResponse.Result result = updateResponse.getResult();
         return result.name().equalsIgnoreCase("updated");
-
     }
 
-    @Override
+    /**
+     * 删除course_public索引库的一条文档数据
+     * @param indexName 索引库名称
+     * @param id        主键
+     * @return
+     */
     public Boolean deleteCourseIndex(String indexName, String id) {
 
-        //删除索引请求对象
+        //准备Request对象
         DeleteRequest deleteRequest = new DeleteRequest(indexName, id);
         //响应对象
         DeleteResponse deleteResponse = null;
         try {
+            //发送请求
             deleteResponse = client.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("删除索引出错:{}", e.getMessage());

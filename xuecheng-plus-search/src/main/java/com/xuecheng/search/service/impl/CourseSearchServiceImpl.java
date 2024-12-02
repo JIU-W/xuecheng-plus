@@ -57,11 +57,14 @@ public class CourseSearchServiceImpl implements CourseSearchService {
     @Override
     public SearchPageResultDto<CourseIndex> queryCoursePubIndex(PageParams pageParams, SearchCourseParamDto courseSearchParam) {
 
-        //设置索引
+        //1.创建Request，设置索引库
         SearchRequest searchRequest = new SearchRequest(courseIndexStore);
+        //2.组织请求参数
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //2.1.准备bool查询
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
         //source源字段过虑
         String[] sourceFieldsArray = sourceFields.split(",");
         searchSourceBuilder.fetchSource(sourceFieldsArray, new String[]{});
@@ -78,6 +81,7 @@ public class CourseSearchServiceImpl implements CourseSearchService {
             multiMatchQueryBuilder.field("name", 10);
             boolQueryBuilder.must(multiMatchQueryBuilder);
         }
+
         //过滤
         if (StringUtils.isNotEmpty(courseSearchParam.getMt())) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("mtName", courseSearchParam.getMt()));
@@ -88,6 +92,7 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         if (StringUtils.isNotEmpty(courseSearchParam.getGrade())) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("grade", courseSearchParam.getGrade()));
         }
+
         //分页
         Long pageNo = pageParams.getPageNo();
         Long pageSize = pageParams.getPageSize();
