@@ -75,7 +75,7 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         if (courseSearchParam == null) {
             courseSearchParam = new SearchCourseParamDto();
         }
-        //关键字搜索(must)
+        //关键字搜索：  采用multi_match全文检索查询
         if (StringUtils.isNotEmpty(courseSearchParam.getKeywords())) {
             //匹配关键字     关键字需要匹配课程的名称、 课程内容：name  description
             MultiMatchQueryBuilder multiMatchQueryBuilder =
@@ -90,6 +90,8 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         //filter过滤：不会计算相关度得分，效率更高。
         //课程大分类过滤
         if (StringUtils.isNotEmpty(courseSearchParam.getMt())) {
+            //term查询：属于精确查询。词条级别的查询。
+            //也就是说不会对用户输入的搜索条件再分词，而是作为一个词条，与搜索的字段内容精确值匹配。
             bool.filter(QueryBuilders.termQuery("mtName", courseSearchParam.getMt()));
         }
         //课程小分类过滤
