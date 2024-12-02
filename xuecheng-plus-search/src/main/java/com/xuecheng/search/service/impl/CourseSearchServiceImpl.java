@@ -54,53 +54,65 @@ public class CourseSearchServiceImpl implements CourseSearchService {
     @Autowired
     private RestHighLevelClient client;
 
-    @Override
-    public SearchPageResultDto<CourseIndex> queryCoursePubIndex(PageParams pageParams, SearchCourseParamDto courseSearchParam) {
+
+    public SearchPageResultDto<CourseIndex> queryCoursePubIndex(PageParams pageParams,
+                                                                SearchCourseParamDto courseSearchParam) {
 
         //1.创建Request，设置索引库
         SearchRequest searchRequest = new SearchRequest(courseIndexStore);
+
         //2.组织请求参数
+        //准备bool查询
+        BoolQueryBuilder bool = QueryBuilders.boolQuery();
 
+
+        //source源字段过滤
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //2.1.准备bool查询
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
-        //source源字段过虑
         String[] sourceFieldsArray = sourceFields.split(",");
         searchSourceBuilder.fetchSource(sourceFieldsArray, new String[]{});
+
+
         if (courseSearchParam == null) {
             courseSearchParam = new SearchCourseParamDto();
         }
-        //关键字
+        //关键字搜索(must)
         if (StringUtils.isNotEmpty(courseSearchParam.getKeywords())) {
-            //匹配关键字
-            MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(courseSearchParam.getKeywords(), "name", "description");
-            //设置匹配占比
+            //匹配关键字     关键字需要匹配课程的名称、 课程内容：name  description
+            MultiMatchQueryBuilder multiMatchQueryBuilder =
+                    QueryBuilders.multiMatchQuery(courseSearchParam.getKeywords(), "name", "description");
+            //设置匹配的最小占比
             multiMatchQueryBuilder.minimumShouldMatch("70%");
             //提升另个字段的Boost值
             multiMatchQueryBuilder.field("name", 10);
-            boolQueryBuilder.must(multiMatchQueryBuilder);
+            bool.must(multiMatchQueryBuilder);
         }
 
-        //过滤
+        //filter过滤：不会计算相关度得分，效率更高。
+        //课程大分类过滤
         if (StringUtils.isNotEmpty(courseSearchParam.getMt())) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("mtName", courseSearchParam.getMt()));
+            bool.filter(QueryBuilders.termQuery("mtName", courseSearchParam.getMt()));
         }
+        //课程小分类过滤
         if (StringUtils.isNotEmpty(courseSearchParam.getSt())) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("stName", courseSearchParam.getSt()));
+            bool.filter(QueryBuilders.termQuery("stName", courseSearchParam.getSt()));
         }
+        //难度等级过滤
         if (StringUtils.isNotEmpty(courseSearchParam.getGrade())) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("grade", courseSearchParam.getGrade()));
+            bool.filter(QueryBuilders.termQuery("grade", courseSearchParam.getGrade()));
         }
+
+        //布尔查询
+        searchSourceBuilder.query(bool);
 
         //分页
         Long pageNo = pageParams.getPageNo();
         Long pageSize = pageParams.getPageSize();
         int start = (int) ((pageNo - 1) * pageSize);
-        searchSourceBuilder.from(start);
-        searchSourceBuilder.size(Math.toIntExact(pageSize));
-        //布尔查询
-        searchSourceBuilder.query(boolQueryBuilder);
+        //- from：从第几个文档开始
+        //- size：总共查询几个文档
+        searchSourceBuilder.from(start).size(Math.toIntExact(pageSize));
+
+
         //高亮设置
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         highlightBuilder.preTags("<font class='eslight'>");
@@ -108,12 +120,16 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         //设置高亮字段
         highlightBuilder.fields().add(new HighlightBuilder.Field("name"));
         searchSourceBuilder.highlighter(highlightBuilder);
+
         //请求搜索
         searchRequest.source(searchSourceBuilder);
+
         //聚合设置
         buildAggregation(searchRequest);
+
         SearchResponse searchResponse = null;
         try {
+            //发送请求
             searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,9 +139,12 @@ public class CourseSearchServiceImpl implements CourseSearchService {
 
         //结果集处理
         SearchHits hits = searchResponse.getHits();
-        SearchHit[] searchHits = hits.getHits();
         //记录总数
         TotalHits totalHits = hits.getTotalHits();
+        long tatal = totalHits.value;
+        //搜索结果
+        SearchHit[] searchHits = hits.getHits();
+
         //数据列表
         List<CourseIndex> list = new ArrayList<>();
 
@@ -141,8 +160,11 @@ public class CourseSearchServiceImpl implements CourseSearchService {
             Long id = courseIndex.getId();
             //取出名称
             String name = courseIndex.getName();
+
             //取出高亮字段内容
+            //Map集合：key是高亮字段名称，值是HighlightField对象，代表高亮值
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+
             if (highlightFields != null) {
                 HighlightField nameField = highlightFields.get("name");
                 if (nameField != null) {
@@ -152,16 +174,19 @@ public class CourseSearchServiceImpl implements CourseSearchService {
                         stringBuffer.append(str.string());
                     }
                     name = stringBuffer.toString();
-
                 }
             }
             courseIndex.setId(id);
+            //高亮的结果替换CourseIndex中的非高亮结果
             courseIndex.setName(name);
 
             list.add(courseIndex);
 
         }
-        SearchPageResultDto<CourseIndex> pageResult = new SearchPageResultDto<>(list, totalHits.value, pageNo, pageSize);
+
+        //封装搜索结果
+        SearchPageResultDto<CourseIndex> pageResult =
+                new SearchPageResultDto<>(list, tatal, pageNo, pageSize);
 
         //获取聚合结果
         List<String> mtList = getAggregation(searchResponse.getAggregations(), "mtAgg");
@@ -169,31 +194,42 @@ public class CourseSearchServiceImpl implements CourseSearchService {
 
         pageResult.setMtList(mtList);
         pageResult.setStList(stList);
-
         return pageResult;
     }
 
-
+    /**
+     * 聚合设置
+     * @param request
+     */
     private void buildAggregation(SearchRequest request) {
+        //这个聚合会根据mtName字段的值进行分组，并返回每个分组的文档数量。
+        //size(100)表示最多返回100个分组。
         request.source().aggregation(AggregationBuilders
-                .terms("mtAgg")
+                .terms("mtAgg")  //terms聚合：按分类聚合
                 .field("mtName")
                 .size(100)
         );
+        //这个聚合会根据stName字段的值进行分组，并返回每个分组的文档数量。
+        //size(100)表示最多返回100个分组。
         request.source().aggregation(AggregationBuilders
                 .terms("stAgg")
                 .field("stName")
                 .size(100)
         );
-
     }
 
+    /**
+     * 解析聚合结果
+     * @param aggregations
+     * @param aggName
+     * @return
+     */
     private List<String> getAggregation(Aggregations aggregations, String aggName) {
-        // 4.1.根据聚合名称获取聚合结果
+        //4.1.根据聚合名称获取聚合结果
         Terms brandTerms = aggregations.get(aggName);
-        // 4.2.获取buckets
+        //4.2.获取buckets
         List<? extends Terms.Bucket> buckets = brandTerms.getBuckets();
-        // 4.3.遍历
+        //4.3.遍历
         List<String> brandList = new ArrayList<>();
         for (Terms.Bucket bucket : buckets) {
             // 4.4.获取key
@@ -202,4 +238,6 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         }
         return brandList;
     }
+
+
 }

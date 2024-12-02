@@ -6,7 +6,7 @@ import lombok.ToString;
 /**
  * @author JIU-W
  * @version 1.0
- * @description 搜索课程参数dto
+ * @description 搜索课程参数dto(前端传过来的)
  * @date 2024-12-01
  */
 @Data

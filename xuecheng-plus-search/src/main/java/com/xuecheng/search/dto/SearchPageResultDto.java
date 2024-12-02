@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author JIU-W
  * @version 1.0
- * @description TODO
+ * @description 搜索结果类
  * @date 2024-12-01
  */
 @Data

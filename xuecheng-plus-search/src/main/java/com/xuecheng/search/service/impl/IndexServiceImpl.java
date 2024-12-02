@@ -33,7 +33,7 @@ public class IndexServiceImpl implements IndexService {
 
 
     @Autowired
-    RestHighLevelClient client;
+    private RestHighLevelClient client;
 
     /**
      * 给course_public索引库添加一条文档数据(添加索引)

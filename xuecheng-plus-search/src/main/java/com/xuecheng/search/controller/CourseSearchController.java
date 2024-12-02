@@ -25,7 +25,7 @@ public class CourseSearchController {
     @Autowired
     CourseSearchService courseSearchService;
 
-    //复合
+
     @ApiOperation("课程搜索列表")
     @GetMapping("/list")
     public SearchPageResultDto<CourseIndex> list(PageParams pageParams,
