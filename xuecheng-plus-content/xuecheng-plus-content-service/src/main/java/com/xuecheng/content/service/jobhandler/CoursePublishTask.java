@@ -66,7 +66,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         saveCourseIndex(mqMessage, courseId);
         //课程缓存
         saveCourseCache(mqMessage, courseId);
-        return true;
+        return false;
     }
 
 
@@ -97,12 +97,6 @@ public class CoursePublishTask extends MessageProcessAbstract {
     //将课程信息缓存至redis
     public void saveCourseCache(MqMessage mqMessage, long courseId) {
         log.debug("将课程信息缓存至redis,课程id:{}", courseId);
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
 
     }
 
@@ -129,7 +123,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         //远程调用搜索服务api添加课程信息到索引
         Boolean add = searchServiceClient.add(courseIndex);
         if(!add){
-            XueChengPlusException.cast("添加索引失败");
+            throw new XueChengPlusException("添加索引失败");
         }
 
         //保存第二阶段状态

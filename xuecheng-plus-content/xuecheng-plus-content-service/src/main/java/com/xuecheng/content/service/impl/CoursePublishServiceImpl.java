@@ -305,7 +305,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         if (course == null) {
             log.debug("远程调用走降级逻辑得到上传的结果为null，课程id:{}", courseId);
             //这里有异常一定要抛出去，一直抛到process方法从而停止任务
-            XueChengPlusException.cast("上传静态文件异常");
+            throw new XueChengPlusException("上传静态文件异常");
         }
     }
 
