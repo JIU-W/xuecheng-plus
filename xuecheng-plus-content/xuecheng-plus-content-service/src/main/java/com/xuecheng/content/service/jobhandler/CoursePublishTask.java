@@ -49,7 +49,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
 
         //参数:分片序号、分片总数、消息类型、一次最多取到的任务数量、一次任务调度执行的超时时间
         process(shardIndex, shardTotal, "course_publish", 30, 60);
-
+                                                                            //1
     }
 
 
@@ -66,7 +66,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         saveCourseIndex(mqMessage, courseId);
         //课程缓存
         saveCourseCache(mqMessage, courseId);
-        return false;
+        return true;//false
     }
 
 
@@ -94,7 +94,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         mqMessageService.completedStageOne(id);
     }
 
-    //将课程信息缓存至redis
+    //TODO 将课程信息缓存至redis
     public void saveCourseCache(MqMessage mqMessage, long courseId) {
         log.debug("将课程信息缓存至redis,课程id:{}", courseId);
 
