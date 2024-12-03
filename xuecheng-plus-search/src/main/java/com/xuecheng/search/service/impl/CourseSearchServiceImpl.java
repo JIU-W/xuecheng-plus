@@ -112,8 +112,10 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         int start = (int) ((pageNo - 1) * pageSize);
         //- from：从第几个文档开始
         //- size：总共查询几个文档
-        searchSourceBuilder.from(start).size(Math.toIntExact(pageSize));
 
+        //"from": 分页开始的位置，默认为0
+        //"size": 每页文档数量，默认10
+        searchSourceBuilder.from(start).size(Math.toIntExact(pageSize));
 
         //高亮设置
         HighlightBuilder highlightBuilder = new HighlightBuilder();
