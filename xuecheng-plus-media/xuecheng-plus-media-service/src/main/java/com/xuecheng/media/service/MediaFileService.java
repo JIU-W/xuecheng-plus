@@ -35,9 +35,12 @@ public interface MediaFileService {
      * @param companyId
      * @param uploadFileParamsDto
      * @param localFilePath
+     * @param objectName 对象名：可能传可能不传(如果是媒资服务自己上传图片则不会传，
+     *                          如果是 内容服务 远程调用 媒资服务上传 html页面 文件到minio则传)
      * @return
      */
-    UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath);
+    UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath,
+                                   String objectName);
 
     /**
      * @description 将文件信息添加到数据库文件表
