@@ -47,9 +47,13 @@ public class CoursePublishTask extends MessageProcessAbstract {
         int shardTotal = XxlJobHelper.getShardTotal();
         log.debug("shardIndex=" + shardIndex + ",shardTotal=" + shardTotal);
 
+        //取出电脑CPU核心数作为一次处理数据的条数
+        int processors = Runtime.getRuntime().availableProcessors();
+        log.debug("一次处理视频数量不要超过cpu核心数:{}", processors);
+
         //参数:分片序号、分片总数、消息类型、一次最多取到的任务数量、一次任务调度执行的超时时间
-        process(shardIndex, shardTotal, "course_publish", 30, 60);
-                                                                            //1
+        process(shardIndex, shardTotal, "course_publish", processors, 60);
+                                                                        //1
     }
 
 

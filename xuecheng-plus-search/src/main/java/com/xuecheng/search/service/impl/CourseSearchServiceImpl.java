@@ -26,6 +26,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -116,6 +117,18 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         //"from": 分页开始的位置，默认为0
         //"size": 每页文档数量，默认10
         searchSourceBuilder.from(start).size(Math.toIntExact(pageSize));
+
+        //排序
+        Integer sortType = courseSearchParam.getSortType();
+        if(sortType != null){
+            if(sortType == 1){
+                //按价格升序
+                searchSourceBuilder.sort("price", SortOrder.ASC);
+            } else if (sortType == 2) {
+                //按价格降序
+                searchSourceBuilder.sort("price", SortOrder.DESC);
+            }
+        }
 
         //高亮设置
         HighlightBuilder highlightBuilder = new HighlightBuilder();
