@@ -11,6 +11,7 @@ import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,6 +67,9 @@ public class CourseBaseInfoController {
     @ApiOperation("根据课程id查询课程信息")
     @GetMapping("/course/{courseId}")
     public CourseBaseInfoDto getCourseBaseById(@PathVariable Long courseId) {
+        //取出当前用户身份
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(principal);
         CourseBaseInfoDto courseBaseInfo = courseBaseInfoService.getCourseBaseInfo(courseId);
         return courseBaseInfo;
     }
