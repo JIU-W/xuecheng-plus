@@ -1,4 +1,4 @@
-package com.config;
+package com.xuecheng.gateway.config;
 
 import java.io.Serializable;
 

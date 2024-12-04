@@ -1,4 +1,4 @@
-package com.config;
+package com.xuecheng.gateway.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
