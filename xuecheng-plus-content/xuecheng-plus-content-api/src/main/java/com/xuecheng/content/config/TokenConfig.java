@@ -1,4 +1,4 @@
-package com.xuecheng.auth.config;
+package com.xuecheng.content.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -7,7 +7,6 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -16,19 +15,13 @@ import java.util.Arrays;
 /**
  * @author Administrator
  * @version 1.0
- * @description 令牌策略配置类
- * @date 2024-12-03
- */
+ **/
 @Configuration
 public class TokenConfig {
 
-    private String SIGNING_KEY = "mq123";
-
-    @Autowired
-    TokenStore tokenStore;
+    String SIGNING_KEY = "mq123";
 
 
-      //基于普通令牌的模式
 //    @Bean
 //    public TokenStore tokenStore() {
 //        //使用内存存储令牌（普通令牌）
@@ -38,13 +31,11 @@ public class TokenConfig {
     @Autowired
     private JwtAccessTokenConverter accessTokenConverter;
 
-    //基于JWT令牌模式
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
     }
 
-    //JWT令牌转换器
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
@@ -52,20 +43,5 @@ public class TokenConfig {
         return converter;
     }
 
-    //令牌管理服务
-    @Bean(name = "authorizationServerTokenServicesCustom")
-    public AuthorizationServerTokenServices tokenService() {
-        DefaultTokenServices service = new DefaultTokenServices();
-        service.setSupportRefreshToken(true);//支持刷新令牌
-        service.setTokenStore(tokenStore);//令牌存储策略
-
-        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(accessTokenConverter));
-        service.setTokenEnhancer(tokenEnhancerChain);
-
-        service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
-        service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
-        return service;
-    }
 
 }
