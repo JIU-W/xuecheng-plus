@@ -60,7 +60,7 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
     @Autowired
     private TokenStore tokenStore;
 
-
+    //网关认证过滤器
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String requestUrl = exchange.getRequest().getPath().value();
