@@ -23,7 +23,7 @@ public interface CourseBaseInfoService {
      * @param queryCourseParamsDto
      * @return
      */
-    PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+    PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
 
     /**
      * 添加课程基本信息和营销信息
