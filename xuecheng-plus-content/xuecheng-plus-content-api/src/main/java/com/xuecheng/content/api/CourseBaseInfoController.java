@@ -12,6 +12,7 @@ import com.xuecheng.content.service.CourseBaseInfoService;
 import com.xuecheng.content.util.SecurityUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class CourseBaseInfoController {
 
     @ApiOperation("课程分页查询")
     @PostMapping("/course/list")
+    @PreAuthorize("hasAuthority('xc_teachmanager_course_list')")//拥有xc_teachmanager_course_list权限方可访问
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody(required = false) QueryCourseParamsDto queryCourseParamsDto) {
         PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
         return courseBasePageResult;

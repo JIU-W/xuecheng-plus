@@ -78,7 +78,7 @@
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
 
-        <!--认证相关-->
+        <!--认证相关 集成Spring Security -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-security</artifactId>
