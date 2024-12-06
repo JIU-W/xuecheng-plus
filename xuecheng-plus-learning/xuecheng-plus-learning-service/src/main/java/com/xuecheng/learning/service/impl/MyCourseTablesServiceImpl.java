@@ -7,11 +7,13 @@ import com.xuecheng.learning.feignclient.ContentServiceClient;
 import com.xuecheng.learning.mapper.XcChooseCourseMapper;
 import com.xuecheng.learning.mapper.XcCourseTablesMapper;
 import com.xuecheng.learning.model.dto.XcChooseCourseDto;
+import com.xuecheng.learning.model.dto.XcCourseTablesDto;
 import com.xuecheng.learning.model.po.XcChooseCourse;
 import com.xuecheng.learning.model.po.XcCourseTables;
 import com.xuecheng.learning.service.MyCourseTablesService;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,9 +64,13 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
             //收费课程加入选课记录表
             chooseCourse = addChargeCoruse(userId, coursepublish);
         }
+
+        XcChooseCourseDto xcChooseCourseDto = new XcChooseCourseDto();
+        BeanUtils.copyProperties(chooseCourse, xcChooseCourseDto);
         //获取学习资格
-        //...
-        return null;
+        XcCourseTablesDto xcCourseTablesDto = getLearningStatus(userId, courseId);
+        xcChooseCourseDto.setLearnStatus(xcCourseTablesDto.getLearnStatus());
+        return xcChooseCourseDto;
     }
 
 
@@ -99,7 +105,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
 
 
     //添加收费课程,收费课程加入选课记录表
-    public XcChooseCourse addChargeCoruse(String userId,CoursePublish coursepublish){
+    public XcChooseCourse addChargeCoruse(String userId, CoursePublish coursepublish) {
 
         //如果存在待支付记录直接返回
         LambdaQueryWrapper<XcChooseCourse> queryWrapper = new LambdaQueryWrapper<>();
@@ -108,7 +114,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
                 .eq(XcChooseCourse::getOrderType, "700002")//收费课程
                 .eq(XcChooseCourse::getStatus, "701002");//待支付
         List<XcChooseCourse> xcChooseCourses = xcChooseCourseMapper.selectList(queryWrapper);
-        if (xcChooseCourses != null && xcChooseCourses.size()>0) {
+        if (xcChooseCourses != null && xcChooseCourses.size() > 0) {
             return xcChooseCourses.get(0);
         }
 
@@ -165,5 +171,30 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
 
     }
 
+
+    //获取学习资格
+    public XcCourseTablesDto getLearningStatus(String userId, Long courseId) {
+        //查询我的课程表
+        XcCourseTables xcCourseTables = getXcCourseTables(userId, courseId);
+        if (xcCourseTables == null) {
+            XcCourseTablesDto xcCourseTablesDto = new XcCourseTablesDto();
+            //没有选课或选课后没有支付
+            xcCourseTablesDto.setLearnStatus("702002");
+            return xcCourseTablesDto;
+        }
+        XcCourseTablesDto xcCourseTablesDto = new XcCourseTablesDto();
+        BeanUtils.copyProperties(xcCourseTables, xcCourseTablesDto);
+        //是否过期,true过期，false未过期
+        boolean isExpires = xcCourseTables.getValidtimeEnd().isBefore(LocalDateTime.now());
+        if (!isExpires) {
+            //正常学习
+            xcCourseTablesDto.setLearnStatus("702001");
+            return xcCourseTablesDto;
+        } else {
+            //已过期
+            xcCourseTablesDto.setLearnStatus("702003");
+            return xcCourseTablesDto;
+        }
+    }
 
 }
