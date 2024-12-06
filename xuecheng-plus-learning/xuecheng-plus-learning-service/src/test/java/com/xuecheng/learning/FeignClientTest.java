@@ -11,9 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 
 /**
- * @author Mr.M
+ * @author JIU-W
  * @version 1.0
- * @description TODO
+ * @description Feign接口测试类
  * @date 2023/2/22 20:14
  */
 @SpringBootTest
@@ -28,4 +28,5 @@ public class FeignClientTest {
         CoursePublish coursepublish = contentServiceClient.getCoursepublish(18L);
         Assertions.assertNotNull(coursepublish);
     }
+
 }
