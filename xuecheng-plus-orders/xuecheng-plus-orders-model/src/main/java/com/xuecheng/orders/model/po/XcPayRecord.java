@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author itcast
@@ -52,6 +52,7 @@ public class XcPayRecord implements Serializable {
      * 订单名称
      */
     private String orderName;
+
     /**
      * 订单总价单位元
      */

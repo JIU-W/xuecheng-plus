@@ -39,9 +39,9 @@ public class MyCourseTablesController {
     public XcChooseCourseDto addChooseCourse(@PathVariable("courseId") Long courseId) {
         //当前登录的用户
         SecurityUtil.XcUser user = SecurityUtil.getUser();
-        if (user == null) {//这个不用加的，只是因为网关那边白名单都放开了，所以这里加一下
+        /*if (user == null) {//这个不用加的，只是因为网关那边白名单都放开了，所以这里加一下
             XueChengPlusException.cast("请登录后继续选课");
-        }
+        }*/
         XcChooseCourseDto xcChooseCourseDto = myCourseTablesService.addChooseCourse(user.getId(), courseId);
         return xcChooseCourseDto;
     }
@@ -51,9 +51,9 @@ public class MyCourseTablesController {
     public XcCourseTablesDto getLearnstatus(@PathVariable("courseId") Long courseId) {
         //登录用户
         SecurityUtil.XcUser user = SecurityUtil.getUser();
-        if(user == null){
+        /*if(user == null){
             XueChengPlusException.cast("请登录后继续选课");
-        }
+        }*/
         String userId = user.getId();
         return  myCourseTablesService.getLearningStatus(userId, courseId);
     }

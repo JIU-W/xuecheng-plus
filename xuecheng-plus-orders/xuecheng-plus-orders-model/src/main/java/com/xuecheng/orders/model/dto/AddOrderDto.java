@@ -4,14 +4,15 @@ import lombok.Data;
 import lombok.ToString;
 
 /**
- * @author Mr.M
+ * @author JIU-W
  * @version 1.0
- * @description 创建商品订单
- * @date 2022/10/4 10:21
+ * @description 创建商品订单  前端传过来的数据封装
+ * @date 2024-12-07
  */
+
 @Data
 @ToString
-public class AddOrderDto  {
+public class AddOrderDto {
 
     /**
      * 总价
@@ -39,7 +40,7 @@ public class AddOrderDto  {
     private String orderDetail;
 
     /**
-     * 外部系统业务id
+     * 外部系统业务id，这里是指选课记录id
      */
     private String outBusinessId;
 
