@@ -89,7 +89,7 @@ public class OrderController {
                 " }");//填充业务参数
         String form = "";//调用SDK生成表单
         //支付宝会根据这个请求，将我们请求的参数，生成一个支付宝的表单，
-        //这个表单的作用就是唤起支付宝的支付页面，从而跳转到支付宝的支付页面。
+        //这个表单的作用就是唤起扫码的手机的支付宝客户端(测试)的支付页面，从而跳转到支付宝的支付页面。
         try {
             //请求支付宝下单接口,发起http请求
             form = client.pageExecute(alipayRequest).getBody(); //调用SDK生成表单
