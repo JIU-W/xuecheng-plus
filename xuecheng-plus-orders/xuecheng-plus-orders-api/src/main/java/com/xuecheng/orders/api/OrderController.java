@@ -26,6 +26,12 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
+    /**
+     * 生成支付二维码：前端一点击“支付宝支付”按钮就会请求这个接口，从而插入订单、订单明细、支付记录、
+     *                      最后生成支付二维码并返回给前端展示。
+     * @param addOrderDto
+     * @return
+     */
     @ApiOperation("生成支付二维码")
     @PostMapping("/generatepaycode")
     @ResponseBody

@@ -55,16 +55,19 @@ public class OrderServiceImpl implements OrderService {
         //生成二维码
         String qrCode = null;
         try {
-            //url要可以被模拟器访问到，url为下单接口(稍后定义)
-            String url = String.format(qrcodeurl, payRecord.getPayNo());
+            //payNo为支付交易流水号，要唯一。后面要传给支付系统支付宝。
+            Long payNo = payRecord.getPayNo();
+            //url要可以被模拟器访问到，url为下单接口路径(稍后定义)
+            //url格式如下：http://192.168.101.1:63030/orders/requestpay?payNo=%s
+            String url = String.format(qrcodeurl, payNo);
             qrCode = new QRCodeUtil().createQRCode(url, 200, 200);
         } catch (IOException e) {
-            XueChengPlusException.cast("生成二维码出错");
+            throw new XueChengPlusException("生成二维码出错");
         }
         PayRecordDto payRecordDto = new PayRecordDto();
         BeanUtils.copyProperties(payRecord, payRecordDto);
+        //设置二维码图片:为base64编码格式
         payRecordDto.setQrcode(qrCode);
-
         return payRecordDto;
     }
 
@@ -87,7 +90,8 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderName(addOrderDto.getOrderName());
         order.setOrderDetail(addOrderDto.getOrderDetail());
         order.setOrderDescrip(addOrderDto.getOrderDescrip());
-        order.setOutBusinessId(addOrderDto.getOutBusinessId());//选课记录id
+        //设置选课记录id
+        order.setOutBusinessId(addOrderDto.getOutBusinessId());
         //插入订单表
         ordersMapper.insert(order);
         //插入订单明细表
