@@ -64,7 +64,6 @@ public class OrderController {
     @ApiOperation("扫码下单接口")
     @GetMapping("/requestpay")
     public void requestpay(String payNo, HttpServletResponse httpResponse) throws IOException {
-
         //根据支付记录号查询支付记录
         //如果payNo不存在则提示重新发起支付
         XcPayRecord payRecord = orderService.getPayRecordByPayno(payNo);
@@ -101,5 +100,20 @@ public class OrderController {
         httpResponse.getWriter().flush();
         httpResponse.getWriter().close();
     }
+
+
+    //主动查询支付结果
+    @ApiOperation("查询支付结果")
+    @GetMapping("/payresult")
+    @ResponseBody
+    public PayRecordDto payresult(String payNo) throws IOException {
+        //调用支付宝接口“根据支付交易号”查询支付结果
+        PayRecordDto payRecordDto = orderService.queryPayResult(payNo);
+        return payRecordDto;
+    }
+
+
+
+
 
 }

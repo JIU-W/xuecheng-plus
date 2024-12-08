@@ -92,7 +92,6 @@ public class PayTestController {
         if (verify_result) {//验证成功
             //////////////////////////////////////////////////////////////////////////////////////////
             //请在这里加上商户的业务逻辑程序代码
-
             //商户订单号
             String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
             //支付宝交易号
