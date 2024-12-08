@@ -1,4 +1,3 @@
-
 #微服务配置
 spring:
   application:
@@ -26,6 +25,9 @@ spring:
             group: xuecheng-plus-common
             refresh: true
           - data-id: feign-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+          - data-id: rabbitmq-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
 
