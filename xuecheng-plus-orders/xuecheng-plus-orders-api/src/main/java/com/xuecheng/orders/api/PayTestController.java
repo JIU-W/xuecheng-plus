@@ -65,7 +65,7 @@ public class PayTestController {
 
 
     //被动接收通知
-    @PostMapping("/paynotify")
+    @PostMapping("/paynotifyTest")
     public void paynotify(HttpServletRequest request, HttpServletResponse response) throws IOException, AlipayApiException {
 
         //获取支付宝POST过来反馈信息
