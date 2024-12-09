@@ -40,7 +40,7 @@ public interface OrderService {
     void saveAliPayStatus(PayStatusDto payStatusDto) ;
 
     /**
-     * 发送通知结果
+     * 发送支付结果通知(发送消息)
      * @param message
      */
     void notifyPayResult(MqMessage message);

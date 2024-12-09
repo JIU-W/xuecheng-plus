@@ -32,7 +32,7 @@ public interface MyCourseTablesService {
     XcCourseTablesDto getLearningStatus(String userId, Long courseId);
 
     /**
-     * @description 保存选课成功
+     * @description 更新选课记录表，向我的课程表插入记录
      * @param chooseCourseId
      * @return
      */

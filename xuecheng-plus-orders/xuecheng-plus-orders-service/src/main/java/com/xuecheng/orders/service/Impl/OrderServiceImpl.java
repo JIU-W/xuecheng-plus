@@ -77,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     MqMessageService mqMessageService;
 
+
     @Transactional
     public PayRecordDto createOrder(String userId, AddOrderDto addOrderDto) {
 
@@ -186,7 +187,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    public PayRecordDto queryPayResult(String payNo){
+    public PayRecordDto queryPayResult(String payNo) {
         //查询数据库的支付记录表数据
         XcPayRecord payRecord = getPayRecordByPayno(payNo);
         if (payRecord == null) {
@@ -216,6 +217,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 请求支付宝查询支付结果
+     *
      * @param payNo 支付交易号
      * @return 支付结果
      */
@@ -260,9 +262,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * @description 保存支付宝支付结果
-     * @param payStatusDto  支付结果信息
+     * @param payStatusDto 支付结果信息
      * @return void
+     * @description 保存支付宝支付结果
      * @author JIU-W
      * @date 2022/10/4 16:52
      */
@@ -276,7 +278,7 @@ public class OrderServiceImpl implements OrderService {
         }
         //支付结果
         String trade_status = payStatusDto.getTrade_status();
-        log.debug("收到支付结果:{},支付记录:{}}", payStatusDto.toString(),payRecord.toString());
+        log.debug("收到支付结果:{},支付记录:{}}", payStatusDto.toString(), payRecord.toString());
         if (trade_status.equals("TRADE_SUCCESS")) {//支付宝返回的信息为支付成功
             //支付金额变为分
             Float totalPrice = payRecord.getTotalPrice() * 100;
@@ -284,7 +286,7 @@ public class OrderServiceImpl implements OrderService {
             //校验是否一致
             if (totalPrice.intValue() != total_amount.intValue()) {
                 //校验失败
-                log.info("校验支付结果失败,支付记录:{},APP_ID:{},totalPrice:{}" ,payRecord.toString(),payStatusDto.getApp_id(),total_amount.intValue());
+                log.info("校验支付结果失败,支付记录:{},APP_ID:{},totalPrice:{}", payRecord.toString(), payStatusDto.getApp_id(), total_amount.intValue());
                 XueChengPlusException.cast("校验支付结果失败");
             }
             log.debug("更新支付结果,支付交易流水号:{},支付结果:{}", payNo, trade_status);
@@ -302,6 +304,7 @@ public class OrderServiceImpl implements OrderService {
                 log.info("更新支付记录状态失败:{}", payRecord_u.toString());
                 XueChengPlusException.cast("更新支付记录状态失败");
             }
+
             //======================== 更新订单表状态为支付成功 ========================
             //关联的订单号
             Long orderId = payRecord.getOrderId();
@@ -321,10 +324,11 @@ public class OrderServiceImpl implements OrderService {
                 XueChengPlusException.cast("更新订单表状态失败");
             }
 
-            //保存消息记录,  参数1：支付结果通知类型， 2: 业务id，3:业务类型
+            //======================= 将消息写到数据库 =========================
+            //参数1：支付结果通知类型， 2: 业务id，3:业务类型
             MqMessage mqMessage = mqMessageService.addMessage("payresult_notify",
                     orders.getOutBusinessId(), orders.getOrderType(), null);
-            //通知消息
+            //发送消息
             notifyPayResult(mqMessage);
         }
 
@@ -332,11 +336,13 @@ public class OrderServiceImpl implements OrderService {
 
 
     /**
-     * 发送通知结果
+     * 发送支付结果通知(发送消息)
+     *
      * @param message
      */
     public void notifyPayResult(MqMessage message) {
-        //1、消息体，转json
+
+        //1.消息内容，转json
         String msg = JSON.toJSONString(message);
         //设置消息持久化
         Message msgObj = MessageBuilder.withBody(msg.getBytes(StandardCharsets.UTF_8))
@@ -345,24 +351,26 @@ public class OrderServiceImpl implements OrderService {
 
         // 2.全局唯一的消息ID，需要封装到CorrelationData中
         CorrelationData correlationData = new CorrelationData(message.getId().toString());
-        // 3.添加callback
+
+        // 3.使用correlationData指定回调方法(生产者确认机制 中的定义ConfirmCallback)
         correlationData.getFuture().addCallback(
                 result -> {
-                    if(result.isAck()){
-                        // 3.1.ack，消息成功
+                    if (result.isAck()) {
+                        //ack，消息成功发送到交换机
                         log.debug("通知支付结果消息发送成功, ID:{}", correlationData.getId());
                         //删除消息表中的记录
                         mqMessageService.completed(message.getId());
-                    }else{
-                        // 3.2.nack，消息失败
-                        log.error("通知支付结果消息发送失败, ID:{}, 原因{}",correlationData.getId(), result.getReason());
+                    } else {
+                        //nack，消息发送失败
+                        log.error("通知支付结果消息发送失败, ID:{}, 原因{}", correlationData.getId(), result.getReason());
                     }
                 },
-                ex -> log.error("消息发送异常, ID:{}, 原因{}",correlationData.getId(),ex.getMessage())
+                //发生异常的回调
+                ex -> log.error("消息发送异常, ID:{}, 原因{}", correlationData.getId(), ex.getMessage())
         );
-        // 发送消息
-        rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT, "", msgObj,correlationData);
-
+        //发送消息
+        rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT,
+                "", msgObj, correlationData);
     }
 
 }
