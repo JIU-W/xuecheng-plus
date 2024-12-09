@@ -25,10 +25,11 @@ public class MyLearningController {
     @Autowired
     private LearningService learningService;
 
+
     @ApiOperation("获取视频")
     @GetMapping("/open/learn/getvideo/{courseId}/{teachplanId}/{mediaId}")
     public RestResponse<String> getvideo(@PathVariable("courseId") Long courseId,
-                                         @PathVariable("courseId") Long teachplanId,
+                                         @PathVariable("teachplanId") Long teachplanId,
                                          @PathVariable("mediaId") String mediaId) {
         //登录用户
         SecurityUtil.XcUser user = SecurityUtil.getUser();
@@ -37,8 +38,8 @@ public class MyLearningController {
             userId = user.getId();
         }
         //获取视频
-        return learningService.getVideo(userId, courseId, teachplanId, mediaId);
-
+        RestResponse<String> result = learningService.getVideo(userId, courseId, teachplanId, mediaId);
+        return result;
     }
 
 }
