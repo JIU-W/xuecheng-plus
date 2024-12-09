@@ -33,7 +33,6 @@ public class MyCourseTablesController {
     private MyCourseTablesService myCourseTablesService;
 
 
-
     @ApiOperation("添加选课")
     @PostMapping("/choosecourse/{courseId}")
     public XcChooseCourseDto addChooseCourse(@PathVariable("courseId") Long courseId) {
@@ -55,13 +54,21 @@ public class MyCourseTablesController {
             XueChengPlusException.cast("请登录后继续选课");
         }*/
         String userId = user.getId();
-        return  myCourseTablesService.getLearningStatus(userId, courseId);
+        return myCourseTablesService.getLearningStatus(userId, courseId);
     }
 
     @ApiOperation("我的课程表")
     @GetMapping("/mycoursetable")
     public PageResult<XcCourseTables> mycoursetable(MyCourseTableParams params) {
-        return null;
+        //登录用户
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        if (user == null) {
+            XueChengPlusException.cast("请登录后继续选课");
+        }
+        String userId = user.getId();
+        //设置当前的登录用户
+        params.setUserId(userId);
+        return myCourseTablesService.mycoursetables(params);
     }
 
 }
