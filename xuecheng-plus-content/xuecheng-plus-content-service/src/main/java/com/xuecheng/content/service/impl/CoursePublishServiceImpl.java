@@ -309,4 +309,14 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         }
     }
 
+    /**
+     * 获取课程发布信息
+     * @param courseId
+     * @return
+     */
+    public CoursePublish getCoursePublish(Long courseId){
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        return coursePublish ;
+    }
+
 }

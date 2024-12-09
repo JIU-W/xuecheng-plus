@@ -9,8 +9,11 @@ import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.service.CourseBaseInfoService;
+import com.xuecheng.content.util.SecurityUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +38,13 @@ public class CourseBaseInfoController {
 
     @ApiOperation("课程分页查询")
     @PostMapping("/course/list")
+    @PreAuthorize("hasAuthority('xc_teachmanager_course_list')")//拥有xc_teachmanager_course_list权限方可访问
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody(required = false) QueryCourseParamsDto queryCourseParamsDto) {
-        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
+        //取出用户身份
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        //机构id
+        String companyId = user.getCompanyId();
+        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(Long.parseLong(companyId),pageParams, queryCourseParamsDto);
         return courseBasePageResult;
     }
 
@@ -66,6 +74,11 @@ public class CourseBaseInfoController {
     @ApiOperation("根据课程id查询课程信息")
     @GetMapping("/course/{courseId}")
     public CourseBaseInfoDto getCourseBaseById(@PathVariable Long courseId) {
+        //取出当前用户身份
+        //Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //System.out.println(principal);
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        System.out.println(user);
         CourseBaseInfoDto courseBaseInfo = courseBaseInfoService.getCourseBaseInfo(courseId);
         return courseBaseInfo;
     }
