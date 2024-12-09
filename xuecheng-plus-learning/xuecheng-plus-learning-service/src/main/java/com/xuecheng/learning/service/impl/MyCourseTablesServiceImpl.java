@@ -208,7 +208,6 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
             return false;
         }
         String status = xcChooseCourse.getStatus();
-        //
         if ("701001".equals(status)) {
             //添加到课程表
             addCourseTabls(xcChooseCourse);
