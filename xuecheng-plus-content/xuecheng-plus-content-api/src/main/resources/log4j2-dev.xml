@@ -26,14 +26,14 @@
                 <TimeBasedTriggeringPolicy interval="1" modulate="true" />
             </Policies>
         </RollingFile>
-        
+
         <!--异步appender-->
          <Async name="AsyncAppender" includeLocation="true">
             <AppenderRef ref="ErrorAppender"/>
             <AppenderRef ref="DebugAppender"/>
         </Async>
     </Appenders>
-    
+
     <Loggers>
          <!--过滤掉spring和mybatis的一些无用的debug信息
         <logger name="org.springframework" level="INFO">
@@ -49,13 +49,13 @@
         </logger>
         <logger name="com.netflix.discovery" level="INFO">
         </logger>
-        
+
         <logger name="RocketmqCommon"  level="INFO" >
 		</logger>
-		
+
 		<logger name="RocketmqRemoting" level="INFO"  >
 		</logger>
-		
+
 		<logger name="RocketmqClient" level="WARN">
 		</logger>
 
@@ -67,7 +67,7 @@
 
         <logger name="org.dromara.hmily.bonuspoint" level="WARN">
         </logger>
-		
+
         <!--OFF   0-->
         <!--FATAL   100-->
         <!--ERROR   200-->
@@ -76,7 +76,7 @@
         <!--DEBUG   500-->
         <!--TRACE   600-->
         <!--ALL   Integer.MAX_VALUE-->
-        <Root level="DEBUG" includeLocation="true">
+        <Root level="info" includeLocation="true">
             <AppenderRef ref="AsyncAppender"/>
             <AppenderRef ref="Console"/>
             <AppenderRef ref="DebugAppender"/>
