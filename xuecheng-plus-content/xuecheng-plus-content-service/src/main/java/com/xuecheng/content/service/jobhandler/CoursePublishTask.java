@@ -156,7 +156,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
             throw new XueChengPlusException("添加索引失败");
         }
 
-        //保存第二阶段状态
+        //保存第三阶段状态
         mqMessageService.completedStageThree(id);
     }
 
