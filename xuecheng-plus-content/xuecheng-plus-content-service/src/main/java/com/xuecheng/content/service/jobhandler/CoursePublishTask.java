@@ -1,5 +1,6 @@
 package com.xuecheng.content.service.jobhandler;
 
+import com.alibaba.fastjson.JSON;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.feignclient.SearchServiceClient;
 import com.xuecheng.content.mapper.CoursePublishMapper;
@@ -14,6 +15,7 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -37,6 +39,9 @@ public class CoursePublishTask extends MessageProcessAbstract {
 
     @Autowired
     private SearchServiceClient searchServiceClient;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     //任务调度入口
@@ -70,7 +75,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         saveCourseIndex(mqMessage, courseId);
         //课程缓存
         saveCourseCache(mqMessage, courseId);
-        return true;//false
+        return true;
     }
 
 
@@ -98,10 +103,31 @@ public class CoursePublishTask extends MessageProcessAbstract {
         mqMessageService.completedStageOne(id);
     }
 
-    //TODO 将课程信息缓存至redis
+    //将课程信息缓存至Redis
+    //课程发布信息的特点的是查询较多，修改很少，这里考虑将课程发布信息进行缓存。
     public void saveCourseCache(MqMessage mqMessage, long courseId) {
         log.debug("将课程信息缓存至redis,课程id:{}", courseId);
-
+        //消息id
+        Long id = mqMessage.getId();
+        //消息处理的service
+        MqMessageService mqMessageService = this.getMqMessageService();
+        //消息幂等性处理
+        int stageTwo = mqMessageService.getStageTwo(id);
+        if(stageTwo == 1){
+            log.debug("课程缓存已处理直接返回，课程id:{}", courseId);
+            return;
+        }
+        //先查询缓存看是否有数据(大概率是没有数据的，但是为了保证程序的健壮性还是先查再存)
+        Object jsonObj = redisTemplate.opsForValue().get("course:" + courseId);
+        if(jsonObj == null){
+            //从数据库查询
+            CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+            if (coursePublish != null) {
+                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish));
+            }
+        }
+        //保存第二阶段状态
+        mqMessageService.completedStageTwo(id);
     }
 
     //保存课程索引信息
@@ -112,8 +138,8 @@ public class CoursePublishTask extends MessageProcessAbstract {
         //消息处理的service
         MqMessageService mqMessageService = this.getMqMessageService();
         //消息幂等性处理
-        int stageOne = mqMessageService.getStageTwo(id);
-        if (stageOne == 1) {
+        int stageThree = mqMessageService.getStageThree(id);
+        if (stageThree == 1) {
             log.debug("课程索引信息已写入，直接返回，课程id:{}", courseId);
             return;
         }
@@ -131,7 +157,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         }
 
         //保存第二阶段状态
-        mqMessageService.completedStageTwo(id);
+        mqMessageService.completedStageThree(id);
     }
 
 }

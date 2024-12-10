@@ -30,6 +30,10 @@ spring:
           - data-id: feign-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true  # profiles默认为dev
+          - data-id: redis-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+
   profiles:
     active: dev   # 环境名称   作为dataid的第二部分
 

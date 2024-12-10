@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -76,6 +77,10 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Autowired
     private MediaServiceClient mediaServiceClient;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
 
@@ -260,7 +265,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             //configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
             //更改为如下方式
             configuration.setTemplateLoader(new
-                    ClassTemplateLoader(this.getClass().getClassLoader(),"/templates"));
+                    ClassTemplateLoader(this.getClass().getClassLoader(), "/templates"));
 
             //设置字符编码
             configuration.setDefaultEncoding("utf-8");
@@ -300,6 +305,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     /**
      * 上传课程静态化页面
+     *
      * @param courseId
      * @param file     静态化文件
      */
@@ -316,12 +322,42 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     /**
      * 获取课程发布信息
+     *
      * @param courseId
      * @return
      */
-    public CoursePublish getCoursePublish(Long courseId){
+    public CoursePublish getCoursePublish(Long courseId) {
         CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
-        return coursePublish ;
+        return coursePublish;
     }
 
+
+    /**
+     * 查询缓存中的课程发布信息
+     *
+     * @param courseId
+     * @return
+     */
+    public CoursePublish getCoursePublishCache(Long courseId) {
+        //查询缓存
+        Object jsonObj = redisTemplate.opsForValue().get("course:" + courseId);
+        if (jsonObj != null) {//缓存中有数据
+            String jsonString = jsonObj.toString();
+            System.out.println("=================从缓存查=================");
+            CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+            return coursePublish;
+        } else {//缓存中没有数据
+            System.out.println("从数据库查询...");
+            //从数据库查询
+            CoursePublish coursePublish = getCoursePublish(courseId);
+            if (coursePublish != null) {
+                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish));
+            }
+            return coursePublish;
+        }
+    }
+
+
+
 }
+
