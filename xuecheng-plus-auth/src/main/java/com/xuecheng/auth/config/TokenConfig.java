@@ -22,6 +22,7 @@ import java.util.Arrays;
 @Configuration
 public class TokenConfig {
 
+    //JWT 密钥
     private String SIGNING_KEY = "mq123";
 
     @Autowired
