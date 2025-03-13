@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 /**
  * @author JIU-W
  * @version 1.0
- * @description 授权服务器配置
+ * @description 授权服务器配置  (配置OAuth2.0授权服务器) (认证服务器)
  * @date 2024-12-03
  */
 @Configuration
@@ -33,7 +33,7 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private AuthenticationManager authenticationManager;
 
     //客户端详情服务
-    //ClientDetailsServiceConfigurer：用来配置客户端详情服务（ClientDetailsService）
+    // ClientDetailsServiceConfigurer：用来配置客户端详情服务（ClientDetailsService）
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()// 使用in-memory存储
@@ -62,7 +62,6 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     }
 
 
-    //令牌端点的安全配置
     //用来配置令牌端点的安全约束
     //AuthorizationServerSecurityConfigurer：用来配置令牌端点的安全约束.
     @Override
