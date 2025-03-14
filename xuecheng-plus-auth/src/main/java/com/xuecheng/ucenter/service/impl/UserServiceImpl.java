@@ -75,7 +75,6 @@ public class UserServiceImpl implements UserDetailsService {
 
     /**
      * 组装用户身份信息
-     *
      * @param user
      * @return
      */

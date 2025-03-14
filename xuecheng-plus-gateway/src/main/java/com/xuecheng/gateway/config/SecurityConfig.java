@@ -16,16 +16,14 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @Configuration
 public class SecurityConfig {
 
-
     //安全拦截配置
-    @Bean
+    /*@Bean
     public SecurityWebFilterChain webFluxSecurityFilterChain(ServerHttpSecurity http) {
-
         return http.authorizeExchange()
-                .pathMatchers("/**").permitAll()
-                .anyExchange().authenticated()
-                .and().csrf().disable().build();
-    }
+                .pathMatchers("/**").permitAll()  //放行所有路径
+                .anyExchange().authenticated()                 //理论上的兜底规则（实际被覆盖）
+                .and().csrf().disable().build();               //关闭CSRF保护
+    }*/
 
 
 }

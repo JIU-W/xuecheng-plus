@@ -29,6 +29,7 @@ public class DaoAuthenticationProviderCustom extends DaoAuthenticationProvider {
 
 
     //屏蔽密码对比
+    @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
 
 

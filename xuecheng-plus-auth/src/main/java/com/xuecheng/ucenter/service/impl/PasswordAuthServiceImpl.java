@@ -66,7 +66,7 @@ public class PasswordAuthServiceImpl implements AuthService {
         String passwordForm = authParamsDto.getPassword();
 
         //校验密码(校验密码本来是交给框架验证，
-        //自定义DaoAuthenticationProvider已经重载了验证方法为空方法，因为并不是每种登录方法都有密码校验过程)
+        //自定义DaoAuthenticationProvider已经重写了验证方法为空方法，因为并不是每种登录方法都有密码校验过程)
         boolean matches = passwordEncoder.matches(passwordForm, passwordDb);
         if (!matches) {
             throw new RuntimeException("账号或密码错误");
