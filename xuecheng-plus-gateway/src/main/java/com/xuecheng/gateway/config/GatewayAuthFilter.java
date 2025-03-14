@@ -95,7 +95,7 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
     }
 
     /**
-     * 获取token
+     * 从请求体获取token
      */
     private String getToken(ServerWebExchange exchange) {
         String tokenStr = exchange.getRequest().getHeaders().getFirst("Authorization");
@@ -109,9 +109,9 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
         return token;
     }
 
-
-
-
+    /**
+     * 网关异常处理，作用：拦截到异常，返回自定义的错误信息
+     */
     private Mono<Void> buildReturnMono(String error, ServerWebExchange exchange) {
         ServerHttpResponse response = exchange.getResponse();
         String jsonString = JSON.toJSONString(new RestErrorResponse(error));
@@ -122,9 +122,9 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
         return response.writeWith(Mono.just(buffer));
     }
 
-
     @Override
     public int getOrder() {
         return 0;
     }
+
 }
